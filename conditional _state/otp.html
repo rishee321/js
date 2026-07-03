@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>OTP Login Demo</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; max-width: 420px; margin:auto; }
+    input { display:block; width:100%; padding:8px; margin:8px 0; box-sizing:border-box; }
+    button { padding:8px 12px; }
+    .hidden { display:none; }
+    .msg { margin:8px 0; padding:10px; border-radius:4px; }
+    .success { background:#e6ffed; border:1px solid #8ae39b; }
+    .error { background:#ffe6e6; border:1px solid #f09; }
+  </style>
+</head>
+
+<body>
+    <!-- <script src="otp.js"></script> -->
+
+  <h2>Login with OTP</h2>
+
+
+  <form id="loginForm">
+    <label>Username
+      <input id="username" type="text" required />
+    </label>
+    <label>Password
+      <input id="password" type="password" required />
+    </label>
+    <button type="submit">Login</button>
+  </form>
+
+  <label style="display:block; margin-top:12px;">Show OTP section
+    <input id="otpToggle" type="checkbox" checked />
+  </label>
+
+  <div id="otpSection">
+    <p>Your OTP (for demo): <strong id="otpValue">—</strong></p>
+    <label>Enter OTP
+      <input id="otpInput" type="number" inputmode="numeric" />
+    </label>
+    <button id="verifyBtn" disabled>Verify OTP</button>
+  </div>
+
+  <div id="message" class="msg hidden"></div>
+
+  <script>
+    (function () {
+      const LOGIN_USER = "admin";
+      const LOGIN_PASS = "1234";
+
+      const loginForm = document.getElementById('loginForm');
+      const usernameEl = document.getElementById('username');
+      const passwordEl = document.getElementById('password');
+
+      const otpSection = document.getElementById('otpSection');
+      const otpValueEl = document.getElementById('otpValue');
+      const otpInput = document.getElementById('otpInput');
+      const verifyBtn = document.getElementById('verifyBtn');
+
+      const message = document.getElementById('message');
+
+      let currentOtp = null;
+
+      function showMessage(text, type) {
+        message.textContent = text;
+        message.className = 'msg ' + (type === 'success' ? 'success' : 'error');
+        message.classList.remove('hidden');
+      }
+
+      function hideMessage() {
+        message.classList.add('hidden');
+      }
+
+      loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const u = usernameEl.value.trim();
+        const p = passwordEl.value;
+
+        if (u === LOGIN_USER && p === LOGIN_PASS) {
+          currentOtp = Math.floor(Math.random() * 9000) + 1000;
+          otpValueEl.textContent = currentOtp;
+          verifyBtn.disabled = false;
+          showMessage('username and password are verified successfully.', 'success');
+        } else {
+          showMessage('Invalid username or password. Please try again.', 'error');
+        }
+      });
+
+      verifyBtn.addEventListener('click', function () {
+    
+        const entered = parseInt(otpInput.value, 10);
+        if (!currentOtp) {
+          showMessage('No OTP generated. Please login first.', 'error');
+          return;
+        }
+        if (entered === currentOtp) {
+          showMessage('login successful!.', 'success');
+          otpInput.value = '';
+          verifyBtn.disabled = true;
+          loginForm.reset();
+          currentOtp = null;
+        } else {
+          showMessage('Invalid OTP. Please try again.', 'error');
+        }
+      });
+
+      const otpToggle = document.getElementById('otpToggle');
+      otpToggle.addEventListener('change', function () {
+        if (otpToggle.checked) otpSection.style.display = '';
+        else otpSection.style.display = 'none';
+      });
+    })();
+  </script>
+</body>
+</html>
